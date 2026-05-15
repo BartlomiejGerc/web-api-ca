@@ -154,6 +154,28 @@ const SiteHeader = () => {
                   </MenuItem>
                 ))}
               </Menu>
+
+              {context.isAuthenticated ? (
+  <>
+    <Typography variant="body1" sx={{ marginLeft: 2, marginRight: 2 }}>
+      Welcome {context.userName}
+    </Typography>
+
+    <Button color="inherit" onClick={handleLogout}>
+      Sign out
+    </Button>
+  </>
+) : (
+  <>
+    <Button color="inherit" onClick={() => handleMenuSelect("/login")}>
+      Login
+    </Button>
+
+    <Button color="inherit" onClick={() => handleMenuSelect("/signup")}>
+      Signup
+    </Button>
+  </>
+)}
             </>
           )}
         </Toolbar>
