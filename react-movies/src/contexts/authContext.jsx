@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import React, { useState, createContext } from "react";
 import { login, signup } from "../api/tmdb-api";
 
 export const AuthContext = createContext(null);
@@ -29,9 +29,9 @@ const AuthContextProvider = (props) => {
   };
 
   const register = async (username, password) => {
-    const result = await signup(username, password);
-    return result.success;
-  };
+  const result = await signup(username, password);
+  return result.success === true;
+};
 
   const signout = () => {
     localStorage.removeItem("token");

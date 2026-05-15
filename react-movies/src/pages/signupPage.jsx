@@ -2,28 +2,30 @@ import React, { useContext, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { AuthContext } from "../contexts/authContext";
 
-const LoginPage = () => {
+const SignupPage = () => {
   const context = useContext(AuthContext);
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [registered, setRegistered] = useState(false);
 
-  if (!context) {
-    return <h1>AuthContext is missing. Check AuthContextProvider in main.jsx.</h1>;
-  }
-
-  const login = async () => {
+  const signup = async () => {
     setErrorMessage("");
 
-    try {
-      const success = await context.authenticate(userName, password);
+    if (!userName || !password) {
+      setErrorMessage("Please enter a username and password.");
+      return;
+    }
 
-      if (!success) {
-        setErrorMessage("Login failed. Check your username and password.");
-      }
-    } catch (error) {
-      setErrorMessage("Login error: " + error.message);
+    const success = await context.register(userName, password);
+
+    if (success) {
+      setRegistered(true);
+    } else {
+      setErrorMessage(
+        "Sign up failed. Password must be at least 8 characters and include one uppercase letter, one lowercase letter, one number, and one special character."
+      );
     }
   };
 
@@ -31,16 +33,19 @@ const LoginPage = () => {
     return <Navigate to="/" />;
   }
 
+  if (registered) {
+    return <Navigate to="/login" />;
+  }
+
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Login</h2>
+    <>
+      <h2>Sign up</h2>
 
       <input
         placeholder="Username"
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
       />
-      <br />
       <br />
 
       <input
@@ -50,17 +55,16 @@ const LoginPage = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <br />
-      <br />
 
-      <button onClick={login}>Log in</button>
+      <button onClick={signup}>Sign up</button>
 
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      {errorMessage && <p>{errorMessage}</p>}
 
       <p>
-        Not registered? <Link to="/signup">Sign up</Link>
+        Already registered? <Link to="/login">Log in</Link>
       </p>
-    </div>
+    </>
   );
 };
 
-export default LoginPage;
+export default SignupPage;
