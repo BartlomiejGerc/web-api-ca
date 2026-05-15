@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthContext } from "./contexts/authContext";
+
 
 import HomePage from "./pages/homePage";
 import MoviePage from "./pages/movieDetailsPage";
@@ -33,6 +35,16 @@ const queryClient = new QueryClient({
   },
 });
 
+const ProtectedRoute = ({ children }) => {
+  const context = useContext(AuthContext);
+
+  if (!context.isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,7 +54,14 @@ const App = () => {
             <SiteHeader />
 
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route
+                            path="/"
+                             element={
+                      <ProtectedRoute>
+                       <HomePage />
+                      </ProtectedRoute>
+                       }
+                          />
 
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
@@ -60,7 +79,7 @@ const App = () => {
 
               <Route path="/movies/:id" element={<MoviePage />} />
 
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           </BrowserRouter>
         </MoviesContextProvider>
