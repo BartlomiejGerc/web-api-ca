@@ -11,6 +11,84 @@ router.get('/', async (req, res) => {
   res.status(200).json(users);
 });
 
+// Get a single user by username
+router.get('/:username', asyncHandler(async (req, res) => {
+  const user = await User.findByUserName(req.params.username);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      msg: 'User not found.'
+    });
+  }
+
+  return res.status(200).json({
+    username: user.username,
+    favorites: user.favorites || []
+  });
+}));
+
+// Add a movie to user's favorites
+router.post('/:username/favorites', asyncHandler(async (req, res) => {
+  const user = await User.findByUserName(req.params.username);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      msg: 'User not found.'
+    });
+  }
+
+  const movieId = Number(req.body.movieId);
+
+  if (!movieId) {
+    return res.status(400).json({
+      success: false,
+      msg: 'movieId is required.'
+    });
+  }
+
+  if (!user.favorites) {
+    user.favorites = [];
+  }
+
+  if (!user.favorites.includes(movieId)) {
+    user.favorites.push(movieId);
+    await user.save();
+  }
+
+  return res.status(200).json({
+    success: true,
+    favorites: user.favorites
+  });
+}));
+
+// Remove a movie from user's favorites
+router.delete('/:username/favorites/:movieId', asyncHandler(async (req, res) => {
+  const user = await User.findByUserName(req.params.username);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      msg: 'User not found.'
+    });
+  }
+
+  const movieId = Number(req.params.movieId);
+
+  if (!user.favorites) {
+    user.favorites = [];
+  }
+
+  user.favorites = user.favorites.filter((id) => id !== movieId);
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    favorites: user.favorites
+  });
+}));
+
 // Register / Authenticate User
 router.post('/', asyncHandler(async (req, res) => {
   if (!req.body.username || !req.body.password) {

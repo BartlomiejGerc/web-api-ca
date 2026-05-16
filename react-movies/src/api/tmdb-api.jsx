@@ -197,3 +197,34 @@ export const signup = async (username, password) => {
 
   return response.json();
 };
+
+export const getUser = async (username) => {
+  const response = await fetch(`http://localhost:8080/api/users/${username}`);
+  return response.json();
+};
+
+export const addFavoriteToUser = async (username, movieId) => {
+  const response = await fetch(
+    `http://localhost:8080/api/users/${username}/favorites`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ movieId }),
+    }
+  );
+
+  return response.json();
+};
+
+export const removeFavoriteFromUser = async (username, movieId) => {
+  const response = await fetch(
+    `http://localhost:8080/api/users/${username}/favorites/${movieId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  return response.json();
+};
